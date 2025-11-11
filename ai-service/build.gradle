@@ -1,0 +1,30 @@
+group = 'com.sparta'
+version = '0.0.1-SNAPSHOT'
+description = 'ai-service'
+
+dependencies {
+    implementation project(':common')
+
+    implementation 'org.springframework.boot:spring-boot-starter'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-webflux'
+    implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
+    runtimeOnly 'org.postgresql:postgresql'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'io.projectreactor:reactor-test'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+    // Google AI
+    implementation("com.google.genai:google-genai:1.8.0")
+
+    // H2 Database (테스트용)
+    testRuntimeOnly 'com.h2database:h2'
+}
+
+
+tasks.named('test') {
+    systemProperty 'spring.profiles.active', 'test'
+
+    useJUnitPlatform()
+}

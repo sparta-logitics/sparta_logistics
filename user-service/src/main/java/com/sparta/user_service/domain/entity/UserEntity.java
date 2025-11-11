@@ -7,30 +7,21 @@ import com.sparta.user_service.domain.enums.UserStatusEnum;
 import com.sparta.user_service.presentation.request.UserCreateRequest;
 import com.example.sparta.common.enums.UserRoleEnum;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.UUID;
 
 @Entity
 @Table(name="p_users")
 @Getter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
 public class UserEntity extends BaseEntity {
     @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "user_id", updatable = false, nullable = false)
     private UUID userId;
-
-    @PrePersist
-    public void prePersist() {
-        if (this.userId == null) {
-            this.userId = UUID.randomUUID();
-        }
-    }
 
     @Column()
     @Enumerated(value = EnumType.STRING)

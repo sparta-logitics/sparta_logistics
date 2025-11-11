@@ -7,7 +7,7 @@ spring:
     config:
       server:
         native:
-          search-locations: classpath:/config-repo
+          search-locations: classpath:/config-repo/
 server:
   port: ${CONFIG_SERVER_PORT}
 

@@ -25,6 +25,10 @@ spring:
           predicates:
             - Path=/v1/auth/**
             - Path=/v1/users/**
+        - id: ai-service
+          uri: lb://ai-service
+          predicates:
+            - Path=/v1/ai/**
 
 jwt:
   secret: "my-super-secret-key-my-super-secret-key-1234"

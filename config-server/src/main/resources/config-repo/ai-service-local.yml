@@ -1,0 +1,27 @@
+spring:
+  datasource:
+    url: ${AI_DB_URL}
+    username: ${AI_DB_USERNAME}
+    password: ${AI_DB_PASSWORD}     # 예: yourpassword
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        format_sql: true
+
+server:
+  port: ${AI_SERVICE_PORT}          # 예: 9007
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: refresh
+
+gemini:
+  api:
+    url: ${GEMINI_URL}
+    key: ${GEMINI_KEY}

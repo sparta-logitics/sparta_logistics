@@ -1,18 +1,18 @@
 server:
-  port: ${USER_SERVICE_PORT}
+  port: ${AI_SERVICE_PORT}
 
 spring:
   application:
-    name: user-service
+    name: ai-service
   config:
     import: "configserver:${CONFIG_SERVER_URL}"
   profiles:
     active: local
 
   datasource:
-    url: ${USER_DB_URL}
-    username: ${USER_DB_USERNAME}
-    password: ${USER_DB_PASSWORD}
+    url: ${AI_DB_URL}
+    username: ${AI_DB_USERNAME}
+    password: ${AI_DB_PASSWORD}
     jpa:
       hibernate:
         ddl-auto: update
