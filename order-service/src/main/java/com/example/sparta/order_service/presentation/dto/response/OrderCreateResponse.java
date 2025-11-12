@@ -5,9 +5,11 @@ import lombok.Builder;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 @Builder
-public record OrderCreateResponse(String deliveryMessage,
+public record OrderCreateResponse(UUID orderId,
+                                  String deliveryMessage,
                                   Long totalAmount,
                                   LocalDateTime orderDate,
                                   String orderedBy,

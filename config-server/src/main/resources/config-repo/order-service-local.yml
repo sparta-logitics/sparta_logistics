@@ -17,6 +17,12 @@ spring:
   jpa:
     hibernate:
       ddl-auto: create
+  cloud:
+    openfeign:
+      client:
+        config:
+          delivery-service:
+            url:
 
 eureka:
   client:

@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import java.util.List;
 import java.util.UUID;
 
-@FeignClient(name = "hub-service") // (B. 허브/경로 서비스의 유레카 이름)
+@FeignClient(name = "hub-service", url = "${HUB-SERVICE_RIBBON_LISTOFSERVERS}") // (B. 허브/경로 서비스의 유레카 이름)
 public interface HubRouteServiceClient {
     // (테스트의 'getRoutes(UUID, UUID)' 호출을 만족시키는 메서드
     @GetMapping("/internal/routes")

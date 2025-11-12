@@ -20,6 +20,9 @@ dependencies {
     implementation project(':common')
 
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.9'
+
+    // spring retry
+    implementation 'org.springframework.retry:spring-retry'
 }
 
 tasks.named('test') {

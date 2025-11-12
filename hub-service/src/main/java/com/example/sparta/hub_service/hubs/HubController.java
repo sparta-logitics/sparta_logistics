@@ -4,12 +4,17 @@ import com.example.sparta.hub_service.hubs.dto.CreateHubCommand;
 import com.example.sparta.hub_service.hubs.dto.CreateHubRequest;
 import com.example.sparta.hub_service.hubs.dto.HubCreateResponse;
 import com.example.sparta.hub_service.hubs.dto.HubDetailResponse;
+import com.example.sparta.hub_service.hubs.dto.HubSearchCondition;
+import com.example.sparta.hub_service.hubs.dto.HubSearchResponse;
 import com.example.sparta.hub_service.hubs.dto.UpdateHubCommand;
 import com.example.sparta.hub_service.hubs.dto.UpdateHubRequest;
 import jakarta.validation.Valid;
 import java.net.URI;
+import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,6 +23,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -29,7 +35,6 @@ public class HubController {
 
     @PostMapping
     public ResponseEntity<HubCreateResponse> createHub(@Valid @RequestBody CreateHubRequest request) {
-
         CreateHubCommand command = new CreateHubCommand(
             request.code(),
             request.name(),
@@ -51,13 +56,19 @@ public class HubController {
     }
 
     @GetMapping("{hubId}")
-    public ResponseEntity<HubDetailResponse> getHub(
-        @PathVariable UUID hubId
-    ) {
-
+    public ResponseEntity<HubDetailResponse> getHub(@PathVariable UUID hubId) {
         HubDetailResponse response = HubDetailResponse.from(
             hubService.getHub(hubId)
         );
+
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping
+    public ResponseEntity<List<HubDetailResponse>> getHubs() {
+        List<HubDetailResponse> response = hubService.getHubs().stream()
+            .map(HubDetailResponse::from)
+            .toList();
 
         return ResponseEntity.ok(response);
     }
@@ -67,7 +78,6 @@ public class HubController {
         @PathVariable UUID hubId,
         @RequestBody UpdateHubRequest request
     ) {
-
         UpdateHubCommand command = new UpdateHubCommand(
             request.code(),
             request.name(),
@@ -80,7 +90,6 @@ public class HubController {
         hubService.updateHubService(hubId, command);
 
         return ResponseEntity.ok().build();
-
     }
 
     /// TODO 유저 ID 받아오기
@@ -94,5 +103,27 @@ public class HubController {
         hubService.deleteHub(hubId, userId);
 
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<Page<HubSearchResponse>> searchHubs(
+        @RequestParam(required = false) String name,
+        @RequestParam(required = false) String code,
+        @RequestParam(required = false) String status,
+        @RequestParam(required = false) String address,
+        Pageable pageable
+    ) {
+        HubSearchCondition condition = HubSearchCondition.of(
+            name,
+            code,
+            status,
+            address
+        );
+
+        Page<HubSearchResponse> responses = hubService
+            .searchHubs(condition, pageable)
+            .map(HubSearchResponse::from);
+
+        return ResponseEntity.ok(responses);
     }
 }

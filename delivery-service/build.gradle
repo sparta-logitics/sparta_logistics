@@ -34,10 +34,34 @@ dependencies {
 	implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
 	implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
 	compileOnly 'org.projectlombok:lombok'
-	runtimeOnly 'com.h2database:h2'
+	// (기존 H2 의존성은 testImplementation으로 변경하거나 삭제)
+	// runtimeOnly 'com.h2database:h2' // ⬅️ (주석 처리 또는 삭제)
+	testImplementation 'com.h2database:h2' // ⬅️ (테스트 시에만 H2 사용)
+	// [추가] PostgreSQL 드라이버
+	runtimeOnly 'org.postgresql:postgresql'
 	annotationProcessor 'org.projectlombok:lombok'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+	// 레딧엠큐
+	implementation 'org.springframework.boot:spring-boot-starter-amqp'
+
+	// 1. Config Client 기본 기능 (Config Server에서 설정 가져오기)
+	implementation 'org.springframework.cloud:spring-cloud-starter-config'
+
+	// 2. Discovery Client 기능 (유레카를 통해 Config Server를 찾기 위함)
+	// 이 라이브러리가 'spring.cloud.config.discovery.enabled' 속성을 활성화합니다.
+	implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
+
+
+	implementation 'org.springframework.retry:spring-retry'
+	implementation 'org.springframework.boot:spring-boot-starter-aop'
+
+	// [REFACTOR] JPA Metamodel 생성기 의존성 추가
+	// Spring Boot 3.2.x는 Hibernate 6.4.x를 사용하므로 호환되는 버전
+	implementation 'org.hibernate.orm:hibernate-jpamodelgen:6.4.4.Final'
+	annotationProcessor 'org.hibernate.orm:hibernate-jpamodelgen:6.4.4.Final'
+
 }
 
 dependencyManagement {

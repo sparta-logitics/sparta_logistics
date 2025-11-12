@@ -17,21 +17,20 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class OrderQueryService {
     private final OrderRepository orderRepository;
 
     // TODO 사용자 권한에 따른 verify 절차 필요
-    @Transactional(readOnly = true)
     public Page<OrderResponse> search(SearchCondition condition, String userEmail, Pageable pageable) {
         if (pageable.getPageSize() < 0 || pageable.getPageNumber() < 0)
             throw new BusinessException(ErrorCode.INVALID_INPUT_VALUE, "페이지 사이즈와 번호는 0 이상이어야합니다.");
         return orderRepository.search(condition, userEmail, pageable);
     }
 
-    @Transactional(readOnly = true)
     public OrderDetailResponse findById(UUID id) {
         return orderRepository.findById(id)
-                .orElseThrow(() -> new BusinessException(ErrorCode.ORDER_NOT_FOUND, "id와 일치하는 주문이 존재하지 않습니다. \n id: " + id))
+                .orElseThrow(() -> new BusinessException(ErrorCode.ORDER_NOT_FOUND))
                 .toDetailResponse();
     }
 }

@@ -1,5 +1,6 @@
 package com.sparta.deliveryservice.service;
 
+import com.sparta.deliveryservice.domain.Delivery;
 import com.sparta.deliveryservice.domain.DeliveryRouteHistory;
 import com.sparta.deliveryservice.domain.enums.RouteStatus;
 import com.sparta.deliveryservice.exception.EntityNotFoundException;
@@ -26,6 +27,9 @@ public class DeliveryRouteServiceTest {
 
     @Mock
     private DeliveryRouteHistoryRepository routeHistoryRepository;
+
+    @Mock
+    private Delivery delivery;
 
     @Test
     @DisplayName("RED Flow 2-1: 담당자 배정 성공 시, driverId가 업데이트되고 상태는 유지되어야 한다.")
@@ -113,6 +117,7 @@ public class DeliveryRouteServiceTest {
         DeliveryRouteHistory fakeRoute = DeliveryRouteHistory.builder()
                 .driverId(assignedDriverId)
                 .status(RouteStatus.WAITING_FOR_TRANSIT)
+                .delivery(delivery)
                 .build();
 
         // 3. Repository가 이 가짜 데이터를 반환하도록 설정
@@ -188,6 +193,7 @@ public class DeliveryRouteServiceTest {
         DeliveryRouteHistory fakeRoute = DeliveryRouteHistory.builder()
                 .driverId(UUID.randomUUID()) // 이미 배정됨
                 .status(RouteStatus.IN_TRANSIT) // 상태가 이동중
+                .delivery(delivery)
                 .build();
 
         // 3. Repository가 이 가짜 데이터를 반환하도록 설정
@@ -226,6 +232,7 @@ public class DeliveryRouteServiceTest {
         DeliveryRouteHistory fakeRoute = DeliveryRouteHistory.builder()
                 .driverId(UUID.randomUUID())
                 .status(RouteStatus.WAITING_FOR_TRANSIT)
+                .delivery(delivery)
                 .build();
 
         // 3. Repository가 이 가짜 데이터를 반환하도록 설정

@@ -7,10 +7,12 @@ import com.sparta.user_service.domain.entity.UserEntity;
 import com.example.sparta.common.enums.UserRoleEnum;
 import com.sparta.user_service.domain.enums.UserStatusEnum;
 import com.sparta.user_service.domain.repository.UserRepository;
+import com.sparta.user_service.presentation.request.UserUpdateRequest;
 import com.sparta.user_service.presentation.response.UserCreateResponse;
 import com.sparta.user_service.presentation.response.UserSearchResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -18,6 +20,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -40,7 +43,6 @@ public class UserServiceV1 {
     }
 
     @Transactional
-
     public UserEntity changeStatus(UUID userId, UserStatusEnum status) {
 
         UserEntity user = userRepository.findById(userId)
@@ -84,6 +86,13 @@ public class UserServiceV1 {
         return userRepository.searchUsers(name, slackId, role, status, pageable);
     }
 
+    @Transactional(readOnly = true)
+    public Page<UserSearchResponse> searchUsersByUserId(UUID userId) {
+        UserEntity user = userRepository.findById(userId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
+        return new PageImpl<>(List.of(UserSearchResponse.of(user)));
+    }
+
     @Transactional
     public void deleteUser(UUID userId, Long deletedBy) {
         UserEntity user = userRepository.findById(userId)
@@ -94,5 +103,18 @@ public class UserServiceV1 {
         }
 
         user.delete(deletedBy);
+    }
+
+    @Transactional
+    public UserEntity updateUser(UUID userId, UserUpdateRequest request) {
+        UserEntity user = userRepository.findById(userId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
+
+        user.updateUserInfo(
+                request.getName(),
+                request.getSlackId()
+        );
+
+        return user;
     }
 }

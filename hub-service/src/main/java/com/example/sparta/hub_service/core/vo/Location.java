@@ -30,6 +30,13 @@ public class Location {
         this.longitude = normalizeAndValidateLongitude(longitude);
     }
 
+    public static Location of(double latitude, double longitude) {
+        return new Location(
+            BigDecimal.valueOf(latitude),
+            BigDecimal.valueOf(longitude)
+        );
+    }
+
     public static Location of(BigDecimal latitude, BigDecimal longitude) {
         return new Location(latitude, longitude);
     }
@@ -54,7 +61,7 @@ public class Location {
             throw new IllegalArgumentException("경도는 필수입니다");
         }
 
-        BigDecimal normalized = latitude.setScale(SCALE, RoundingMode.HALF_UP);
+        BigDecimal normalized = longitude.setScale(SCALE, RoundingMode.HALF_UP);
 
         if (normalized.compareTo(MIN_LONGITUDE) < 0 || normalized.compareTo(MAX_LONGITUDE) > 0) {
             throw new IllegalArgumentException("경도 범위는 -180 ~ 180 사이여야 합니다.");

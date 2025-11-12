@@ -1,14 +1,22 @@
+server:
+  port: ${USER_SERVICE_PORT:9006}
+
 spring:
+  application:
+    name: user-service
   datasource:
-    driver-class-name: org.postgresql.Driver
     url: ${USER_DB_URL}
     username: ${USER_DB_USERNAME}
     password: ${USER_DB_PASSWORD}
-  jpa:
-    database-platform: org.hibernate.dialect.PostgreSQLDialect
-    hibernate:
-      ddl-auto: update
-    show-sql: true
-    properties:
+    driver-class-name: org.postgresql.Driver
+    jpa:
       hibernate:
-        format_sql: true
+        ddl-auto: update
+      show-sql: true
+
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_DEFAULT_ZONE}
+    register-with-eureka: true
+    fetch-registry: true

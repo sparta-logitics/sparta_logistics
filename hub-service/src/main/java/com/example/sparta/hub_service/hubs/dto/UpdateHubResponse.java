@@ -2,7 +2,6 @@ package com.example.sparta.hub_service.hubs.dto;
 
 import com.example.sparta.hub_service.core.enums.HubCode;
 import com.example.sparta.hub_service.core.enums.HubStatus;
-import com.example.sparta.hub_service.core.vo.HubAddress;
 import com.example.sparta.hub_service.hubs.HubResult;
 import java.math.BigDecimal;
 import java.util.UUID;
@@ -11,7 +10,7 @@ public record UpdateHubResponse(
     UUID hubId,
     HubCode code,
     String name,
-    HubAddress address,
+    String address,
     HubStatus status,
     BigDecimal latitude,
     BigDecimal longitude

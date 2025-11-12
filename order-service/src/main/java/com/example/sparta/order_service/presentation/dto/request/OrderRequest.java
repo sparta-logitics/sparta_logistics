@@ -9,10 +9,11 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public record OrderRequest(
-        @NotNull
         String deliveryMessage,
+        // TODO slackId 저장 로직 고려
+        String slackId,
         @NotNull LocalDateTime dueDate,
-        @NotNull ShippingInfoRequest originInfo,
+        @NotNull(message = "주문 정보는 Null일 수 없습니다.") ShippingInfoRequest originInfo,
         @NotNull ShippingInfoRequest recipientInfo,
         @NotNull List<OrderLineRequest> orderLines) {
 

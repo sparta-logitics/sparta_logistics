@@ -8,9 +8,16 @@ import com.example.sparta.hub_service.core.enums.HubStatus;
 import com.example.sparta.hub_service.core.vo.HubAddress;
 import com.example.sparta.hub_service.core.vo.Location;
 import com.example.sparta.hub_service.hubs.dto.CreateHubCommand;
+import com.example.sparta.hub_service.hubs.dto.HubSearchCondition;
 import com.example.sparta.hub_service.hubs.dto.UpdateHubCommand;
+import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,52 +28,63 @@ public class HubService {
 
     private final HubRepository hubRepository;
 
-
     @Transactional
+    @CacheEvict(cacheNames = "hub", allEntries = true)
     public UUID createHub(CreateHubCommand command) {
-
         HubCode hubCode = HubCode.of(command.code());
 
         if (hubRepository.existsByCode(hubCode)) {
-            throw new IllegalStateException("이미 존재하는 허브 코드입니다");
+            throw new BusinessException(ErrorCode.HUB_CODE_ALREADY_EXISTS);
         }
 
-        HubAddress hubAddress = HubAddress.of(
-            command.address()
-        );
+        HubAddress hubAddress = HubAddress.of(command.address());
 
         Location hubLocation = Location.of(
             command.latitude(),
             command.longitude()
         );
 
-        Hub hub = Hub.create(
-            hubCode,
-            command.name(),
-            hubAddress,
-            hubLocation
-        );
+        Hub hub = Hub.create(hubCode, command.name(), hubAddress, hubLocation);
 
         Hub savedHub = hubRepository.save(hub);
 
         return savedHub.getId();
     }
 
+    @Cacheable(value = "hub", key = "#hubId")
     public HubResult getHub(UUID hubId) {
         Hub hub = getHubById(hubId);
 
         return HubResult.from(hub);
     }
 
+    @Cacheable(value = "hubList")
+    public List<HubResult> getHubs() {
+        return hubRepository
+            .findAllByDeletedAtIsNull()
+            .stream()
+            .map(HubResult::from)
+            .toList();
+    }
+
     @Transactional
+    @Caching(evict = {
+        @CacheEvict(cacheNames = "hub", key = "#hubId"),
+        @CacheEvict(cacheNames = "hubList", allEntries = true)
+    })
     public void updateHubService(UUID hubId, UpdateHubCommand command) {
         Hub hub = getHubById(hubId);
 
-        HubCode hubCode = HubCode.of(command.code());
+        HubCode newHubCode = HubCode.of(command.code());
 
-        HubAddress hubAddress = HubAddress.of(
-            command.address()
-        );
+        if (
+            !hub.getCode().equals(newHubCode) &&
+            hubRepository.existsByCode(newHubCode)
+        ) {
+            throw new BusinessException(ErrorCode.HUB_CODE_ALREADY_EXISTS);
+        }
+
+        HubAddress hubAddress = HubAddress.of(command.address());
 
         HubStatus hubStatus = HubStatus.from(command.status());
 
@@ -76,24 +94,35 @@ public class HubService {
         );
 
         hub.update(
-            hubCode,
+            newHubCode,
             command.name(),
             hubStatus,
             hubAddress,
             hubLocation
         );
-
     }
 
     @Transactional
+    @Caching(evict = {
+        @CacheEvict(cacheNames = "hub", key = "#hubId"),
+        @CacheEvict(cacheNames = "hubList", allEntries = true)
+    })
     public void deleteHub(UUID hubId, Long userId) {
         Hub hub = getHubById(hubId);
 
         hub.delete(userId);
     }
 
+    public Page<HubResult> searchHubs(
+        HubSearchCondition condition,
+        Pageable pageable
+    ) {
+        return hubRepository.search(condition, pageable);
+    }
+
     private Hub getHubById(UUID hubId) {
-        return hubRepository.findById(hubId)
+        return hubRepository
+            .findById(hubId)
             .orElseThrow(() -> new BusinessException(ErrorCode.HUB_NOT_FOUND));
     }
 }

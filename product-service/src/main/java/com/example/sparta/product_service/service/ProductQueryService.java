@@ -1,7 +1,12 @@
 package com.example.sparta.product_service.service;
 
+import com.example.sparta.product_service.dto.ProductCreateRequestDto;
+import com.example.sparta.product_service.dto.ProductCreateResponseDto;
+import com.example.sparta.product_service.dto.ProductDeleteResponseDto;
 import com.example.sparta.product_service.dto.ProductResponseDto;
 import com.example.sparta.product_service.dto.ProductSearchCriteria;
+import com.example.sparta.product_service.dto.ProductUpdateRequestDto;
+import com.example.sparta.product_service.dto.ProductUpdateResponseDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -40,4 +45,41 @@ public interface ProductQueryService {
      * @throws com.example.sparta.product_service.exception.ProductNotFoundException 상품을 찾을 수 없는 경우
      */
     ProductResponseDto getProductById(UUID productId);
+    
+    /**
+     * 신규 상품 생성
+     * 
+     * 새로운 상품을 등록하며, 소속 업체와 허브의 존재 여부를 검증합니다.
+     * 상품명 중복도 검증합니다.
+     * 
+     * @param requestDto 상품 생성 요청 정보
+     * @return 생성된 상품 정보
+     * @throws com.example.sparta.common.exception.BusinessException 업체/허브가 존재하지 않거나 상품명이 중복되는 경우
+     */
+    ProductCreateResponseDto createProduct(ProductCreateRequestDto requestDto);
+    
+    /**
+     * 상품 정보 수정
+     * 
+     * 기존 상품의 정보를 수정합니다.
+     * 상품명과 상태를 부분적으로 수정할 수 있습니다.
+     * 
+     * @param productId 수정할 상품 ID
+     * @param requestDto 수정할 상품 정보
+     * @return 수정된 상품 정보
+     * @throws com.example.sparta.product_service.exception.ProductNotFoundException 상품을 찾을 수 없는 경우
+     */
+    ProductUpdateResponseDto updateProduct(UUID productId, ProductUpdateRequestDto requestDto);
+    
+    /**
+     * 상품 논리 삭제
+     * 
+     * 상품을 논리적으로 삭제합니다.
+     * 실제 데이터는 유지하며 deleted_at, deleted_by 필드를 설정하고 상태를 INACTIVE로 변경합니다.
+     * 
+     * @param productId 삭제할 상품 ID
+     * @return 삭제된 상품 정보
+     * @throws com.example.sparta.product_service.exception.ProductNotFoundException 상품을 찾을 수 없는 경우
+     */
+    ProductDeleteResponseDto deleteProduct(UUID productId);
 }

@@ -1,0 +1,43 @@
+server:
+  port: 8088 # 배송 서비스 포트
+
+spring:
+  datasource:
+    url: jdbc:postgresql://postgres-db:5432/delivery_db
+    username: your_postgres_user
+    password: your_postgres_password
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+    show-sql: true
+  rabbitmq:
+    host: rabbitmq-server
+    port: 5672
+    username: your_rabbitmq_user
+    password: your_rabbitmq_password
+    publisher-confirm-type: correlated
+    listener:
+      simple:
+        retry:
+          enabled: true
+          initial-interval: 5000 # 5초 후 재시도
+          max-attempts: 10 # 10회 시도
+
+logging:
+  level:
+    org.springframework.amqp.rabbit.core.RabbitAdmin: DEBUG
+
+    root: INFO
+    # Spring 및 DB 트랜잭션/쿼리 레벨을 DEBUG/TRACE로 올려 상세 오류를 잡습니다.
+    org.springframework.web: DEBUG
+    org.springframework.orm.jpa: DEBUG
+    org.springframework.transaction: DEBUG
+    org.hibernate: TRACE # DB 쿼리 파라미터 및 트랜잭션 상세 정보 출력
+
+    # 애플리케이션 패키지 로그 (com.sparta.deliveryservice)도 DEBUG로 확인합니다.
+    com.sparta: DEBUG

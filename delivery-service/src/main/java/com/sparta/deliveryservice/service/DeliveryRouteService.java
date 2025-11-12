@@ -1,6 +1,9 @@
 package com.sparta.deliveryservice.service;
 
+import com.sparta.deliveryservice.domain.Delivery;
 import com.sparta.deliveryservice.domain.DeliveryRouteHistory;
+import com.sparta.deliveryservice.domain.enums.DeliveryStatus;
+import com.sparta.deliveryservice.domain.enums.RouteStatus;
 import com.sparta.deliveryservice.exception.EntityNotFoundException;
 import com.sparta.deliveryservice.repository.DeliveryRouteHistoryRepository;
 import lombok.RequiredArgsConstructor;
@@ -51,12 +54,15 @@ public class DeliveryRouteService {
         // 이 메서드가 담당자없음 또는 상태이상 예외를 던짐
         route.startRoute();
 
+        Delivery delivery = route.getDelivery();
+        delivery.startRoute();
+
         // 3. TDD 검증. save 호출(성공 시에만)
         routeHistoryRepository.save(route);
     }
 
     /**
-     * TDD Flow2-3: 허브 도착(아직 뼈대만 있음)
+     * TDD Flow 2-3: 허브 도착
      */
     @Transactional
     public void completeRoute(UUID routeHistoryId, Double actualDistance, Integer actualDuration) {
@@ -68,6 +74,13 @@ public class DeliveryRouteService {
         // 2. [TDD 검증] 도메인 로직 호출
         // 이 메서드가 '상태 불일치' 예외를 던짐
         route.completeRoute(actualDistance, actualDuration);
+
+        Delivery delivery = route.getDelivery();
+        boolean completeHubDelivery = delivery.getRouteHistories().stream()
+                .allMatch(r -> {
+                    return r.getStatus() == RouteStatus.ARRIVED_AT_HUB;
+                });
+        if (completeHubDelivery) delivery.completeHubDelivery();
 
         // 3. [TDD 검증] save 호출 (성공 시에만)
         routeHistoryRepository.save(route);

@@ -1,6 +1,6 @@
 package com.example.sparta.order_service;
 
-import com.example.sparta.order_service.application.service.OrderService;
+import com.example.sparta.order_service.application.service.OrderCommandService;
 import com.example.sparta.order_service.domain.entity.Order;
 import com.example.sparta.order_service.domain.repository.OrderRepository;
 import com.example.sparta.order_service.presentation.dto.request.OrderLineRequest;
@@ -31,7 +31,7 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 public class OrderUnitTests {
     @InjectMocks
-    private OrderService orderService;
+    private OrderCommandService orderCommandService;
     @Mock
     private OrderRepository orderRepository;
 
@@ -55,6 +55,7 @@ public class OrderUnitTests {
 
         orderRequest = new OrderRequest(
                 "배송메시지 테스트",
+                "slackId",
                 LocalDateTime.of(LocalDate.of(2999, 12, 31), LocalTime.now()),
                 originInfo,
                 recipientInfo,
@@ -66,13 +67,14 @@ public class OrderUnitTests {
     @Test
     void createOrder_Success() {
         Order order = orderRequest.toEntity();
+        String userEmail = "tempUserEmail";
 
         when(orderRepository.save(any(Order.class)))
                 .thenReturn(order);
 
         ArgumentCaptor<Order> orderArgumentCaptor = ArgumentCaptor.forClass(Order.class);
 
-        OrderCreateResponse createResponse = orderService.create(orderRequest);
+        OrderCreateResponse createResponse = orderCommandService.create(orderRequest, userEmail);
 
         assertThat(createResponse).isNotNull();
         assertThat(createResponse.totalAmount()).isEqualTo(35000L);
@@ -84,10 +86,11 @@ public class OrderUnitTests {
     @DisplayName("주문 생성 실패: DB 저장 중 에러 발생")
     @Test
     void createOrder_Fail_DB() {
+        String userEmail = "tempUserEmail";
         when(orderRepository.save(any(Order.class)))
                 .thenThrow(new DataAccessException("Test DB Error") {});
 
-        assertThatThrownBy(() -> orderService.create(orderRequest))
+        assertThatThrownBy(() -> orderCommandService.create(orderRequest, userEmail))
                 .isInstanceOf(DataAccessException.class)
                 .hasMessageContaining("Test DB Error");
 

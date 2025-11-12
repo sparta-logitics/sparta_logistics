@@ -29,7 +29,7 @@ public class GlobalExceptionHandler {
     }
 
     /**
-     * ✅ @Valid 검증 예외 처리
+     * @Valid 검증 예외 처리
      */
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<?> handleValidationException(MethodArgumentNotValidException e,
@@ -50,7 +50,7 @@ public class GlobalExceptionHandler {
     }
 
     /**
-     * ✅ 타입 불일치 예외
+     * 타입 불일치 예외
      */
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     public ResponseEntity<?> handleTypeMismatch(MethodArgumentTypeMismatchException e,
@@ -62,7 +62,7 @@ public class GlobalExceptionHandler {
     }
 
     /**
-     * ✅ 기타 예상 못한 모든 예외 잡기
+     * 기타 예상 못한 모든 예외 잡기
      */
     @ExceptionHandler(Exception.class)
     public ResponseEntity<?> handleException(Exception e, HttpServletRequest request) {

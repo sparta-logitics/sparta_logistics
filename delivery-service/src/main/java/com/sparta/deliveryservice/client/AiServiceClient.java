@@ -6,7 +6,7 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
-@FeignClient(name = "ai-service") // (F. AI 서비스의 유레카 이름)
+@FeignClient(name = "ai-service", url = "${AI-SERVICE_RIBBON_LISTOFSERVERS}") // (F. AI 서비스의 유레카 이름)
 public interface AiServiceClient {
 
     // (테스트의 'calculateEta(EtaPredictRequest)' 호출을 만족시키는 메서드)

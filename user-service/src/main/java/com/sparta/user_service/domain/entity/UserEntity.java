@@ -44,6 +44,19 @@ public class UserEntity extends BaseEntity {
     @Builder.Default
     private UserStatusEnum status = UserStatusEnum.PENDING;
 
+    // 권한별 식별값 추가
+//    @Column(name = "hub_id")
+//    private UUID hubId;
+//
+//    @Column(name = "company_id")
+//    private UUID companyId;
+//
+//    @Column(name = "delivery_id")
+//    private UUID deliveryId;
+//
+//    @Column(name = "master_id")
+//    private UUID masterId;
+
     public static UserEntity create(UserCreateRequest userCreateRequest, String encodedPassword){
         return UserEntity.builder()
                 .role(userCreateRequest.getRole())
@@ -65,5 +78,13 @@ public class UserEntity extends BaseEntity {
         this.role = role;
     }
 
+    public void updateUserInfo(String name, String slackId) {
+        if (name != null && !name.isBlank()) {
+            this.name = name;
+        }
+        if (slackId != null && !slackId.isBlank()) {
+            this.slackId = slackId;
+        }
+    }
 }
 

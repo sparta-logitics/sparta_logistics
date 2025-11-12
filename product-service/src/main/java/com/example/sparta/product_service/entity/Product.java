@@ -86,6 +86,15 @@ public class Product extends BaseEntity {
     }
     
     /**
+     * 상품 상태를 변경합니다.
+     * 
+     * @param status 새로운 상품 상태
+     */
+    public void updateStatus(ProductStatus status) {
+        this.status = status;
+    }
+    
+    /**
      * 상품을 논리적으로 삭제합니다.
      * 
      * 실제 데이터는 유지하며 상태를 INACTIVE로 변경합니다.

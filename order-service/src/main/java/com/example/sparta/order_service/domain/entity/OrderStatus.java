@@ -10,6 +10,7 @@ public enum OrderStatus {
     DELIVERED("상품 배송 중"),
     COMPLETED("배송 완료"),
     CANCELED("주문 취소"),
+    FAIL("주문 실패"),
     RETURNED("반품");
 
     private final String value;

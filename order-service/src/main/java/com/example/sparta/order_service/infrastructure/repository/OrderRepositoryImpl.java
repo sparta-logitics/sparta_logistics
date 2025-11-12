@@ -50,6 +50,7 @@ public class OrderRepositoryImpl implements OrderQueryRepository {
     public Page<OrderResponse> search(SearchCondition condition, String userEmail, Pageable pageable) {
         List<OrderResponse> content = queryFactory
                 .select(new QOrderResponse(
+                        order.orderId,
                         order.createdAt,
                         order.dueDate,
                         order.recipientInfo.companyName,

@@ -8,6 +8,39 @@ spring:
     web-application-type: reactive  # Spring 애플리케이션이 리액티브 웹 애플리케이션으로 설정됨
   cloud:
     gateway:
+      server:
+        webflux:
+          discovery:
+            locator:
+              enabled: true  # 서비스 디스커버리를 통해 동적으로 라우트를 생성하도록 설정
+              lower-case-service-id: true
+          routes:
+            - id: hub-service
+              uri: lb://hub-service
+              predicates:
+                - Path=/v1/hub/**
+            - id: order-service
+              uri: lb://order-service
+              predicates:
+                - Path=/v1/orders/**
+            - id: user-service
+              uri: lb://user-service
+              predicates:
+                - Path=/v1/users/**
+              filters:
+                - RemoveRequestHeader=Cookie
+            - id: delivery-service
+              uri: lb://DELIVERY-SERVICE
+              predicates:
+                - Path=/v1/delivery/**
+            - id: auth-service
+              uri: lb://auth-service
+              predicates:
+                - Path=/v1/auth/
+            - id: ai-service
+              uri: lb://ai-service
+              predicates:
+                - Path=/v1/ai/**
       discovery:
         locator:
           enabled: true  # 서비스 디스커버리를 통해 동적으로 라우트를 생성하도록 설정
@@ -31,11 +64,16 @@ spring:
             - Path=/v1/ai/**
 
 jwt:
-  secret: "my-super-secret-key-my-super-secret-key-1234"
-  expiration: 3600000
+  secret: ${JWT_SECRET}
+  expiration: ${JWT_EXPIRATION}
 
 management:
   endpoints:
     web:
       exposure:
         include: refresh
+
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_DEFAULT_ZONE}

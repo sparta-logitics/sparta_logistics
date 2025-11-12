@@ -1,8 +1,5 @@
 package com.example.sparta.api_gateway.exception;
 
-import com.example.sparta.common.dto.ErrorResponse;
-import com.example.sparta.common.exception.BusinessException;
-import com.example.sparta.common.exception.ErrorCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -14,43 +11,43 @@ import org.springframework.web.server.ServerWebExchange;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(BusinessException.class)
-    public ResponseEntity<?> handleBusinessException(
+    public ResponseEntity<ErrorResponse> handleBusinessException(
             BusinessException e,
             ServerWebExchange exchange
     ) {
-        ErrorCode errorCode = e.getErrorCode();
+        ErrorCode code = e.getErrorCode();
         return ResponseEntity
-                .status(errorCode.getHttpStatus())
-                .body(ErrorResponse.of(errorCode, exchange.getRequest().getPath().value()));
+                .status(code.getStatusCode())
+                .body(ErrorResponse.of(code, exchange.getRequest().getPath().value()));
     }
 
     @ExceptionHandler(WebExchangeBindException.class)
-    public ResponseEntity<?> handleValidationException(
+    public ResponseEntity<ErrorResponse> handleValidationException(
             WebExchangeBindException e,
             ServerWebExchange exchange
     ) {
         return ResponseEntity
-                .status(ErrorCode.INVALID_INPUT_VALUE.getHttpStatus())
+                .status(ErrorCode.INVALID_INPUT_VALUE.getStatusCode())
                 .body(ErrorResponse.of(ErrorCode.INVALID_INPUT_VALUE, exchange.getRequest().getPath().value()));
     }
 
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
-    public ResponseEntity<?> handleTypeMismatch(
+    public ResponseEntity<ErrorResponse> handleTypeMismatch(
             MethodArgumentTypeMismatchException e,
             ServerWebExchange exchange
     ) {
         return ResponseEntity
-                .status(ErrorCode.INVALID_TYPE_VALUE.getHttpStatus())
+                .status(ErrorCode.INVALID_TYPE_VALUE.getStatusCode())
                 .body(ErrorResponse.of(ErrorCode.INVALID_TYPE_VALUE, exchange.getRequest().getPath().value()));
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<?> handleException(
+    public ResponseEntity<ErrorResponse> handleException(
             Exception e,
             ServerWebExchange exchange
     ) {
         return ResponseEntity
-                .status(ErrorCode.INTERNAL_SERVER_ERROR.getHttpStatus())
+                .status(ErrorCode.INTERNAL_SERVER_ERROR.getStatusCode())
                 .body(ErrorResponse.of(ErrorCode.INTERNAL_SERVER_ERROR, exchange.getRequest().getPath().value()));
     }
 }

@@ -1,8 +1,8 @@
 package com.example.sparta.order_service.domain.entity;
 
 import com.example.sparta.common.model.BaseEntity;
+import com.example.sparta.order_service.application.event.OrderCreateEvent;
 import com.example.sparta.order_service.presentation.dto.request.OrderLineRequest;
-import com.example.sparta.order_service.presentation.dto.request.OrderRequest;
 import com.example.sparta.order_service.presentation.dto.request.OrderUpdateRequest;
 import com.example.sparta.order_service.presentation.dto.response.OrderCreateResponse;
 import com.example.sparta.order_service.presentation.dto.response.OrderDetailResponse;
@@ -25,9 +25,7 @@ public class Order extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID orderId;
-    @Column(nullable = false)
     private UUID deliveryId;
-    @Column(nullable = false)
     private UUID hubId;
     @Column(nullable = false)
     private String userEmail;
@@ -95,6 +93,7 @@ public class Order extends BaseEntity {
 
     public OrderCreateResponse toCreateResponse() {
         return OrderCreateResponse.builder()
+                .orderId(orderId)
                 .deliveryMessage(deliveryMessage)
                 .totalAmount(totalAmount)
                 .orderDate(getCreatedAt())
@@ -129,6 +128,14 @@ public class Order extends BaseEntity {
         return status == OrderStatus.PAYMENT_PENDING || status == OrderStatus.PREPARING_FOR_SHIPMENT;
     }
 
+    public void assignDeliveryId(UUID deliveryId) {
+        this.deliveryId = deliveryId;
+    }
+
+    public void changeOrderStatus(OrderStatus status) {
+        this.status = status;
+    }
+
     public OrderDetailResponse toDetailResponse() {
         return OrderDetailResponse.builder()
                 .deliveryMessage(deliveryMessage)
@@ -138,6 +145,20 @@ public class Order extends BaseEntity {
                 .state(status)
                 .originInfo(originInfo.toResponse())
                 .recipientInfo(recipientInfo.toResponse())
+                .orderLines(orderLines.stream().map(OrderLine::toResponse).toList())
+                .build();
+    }
+
+    public OrderCreateEvent toEvent() {
+        return OrderCreateEvent.builder()
+                .orderId(orderId)
+                .destinationAddress(recipientInfo.toResponse().address())
+                .recipientName(recipientInfo.toResponse().name())
+                // TODO Order Entity에 slackId도 넣어야할지 고려
+                .recipientSlackId("tempSlackId")
+                // TODO 배송 생성 request에 hubId가 필요한지 논의
+                .originHubId(UUID.randomUUID())
+                .destinationHubId(UUID.randomUUID())
                 .orderLines(orderLines.stream().map(OrderLine::toResponse).toList())
                 .build();
     }

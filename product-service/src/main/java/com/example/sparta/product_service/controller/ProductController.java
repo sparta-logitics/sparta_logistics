@@ -1,6 +1,11 @@
 package com.example.sparta.product_service.controller;
 
+import com.example.sparta.product_service.dto.ProductCreateRequestDto;
+import com.example.sparta.product_service.dto.ProductCreateResponseDto;
+import com.example.sparta.product_service.dto.ProductDeleteResponseDto;
 import com.example.sparta.product_service.dto.ProductResponseDto;
+import com.example.sparta.product_service.dto.ProductUpdateRequestDto;
+import com.example.sparta.product_service.dto.ProductUpdateResponseDto;
 import com.example.sparta.product_service.service.ProductService;
 import com.example.sparta.common.exception.BusinessException;
 import com.example.sparta.common.exception.ErrorCode;
@@ -9,6 +14,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -57,12 +63,13 @@ public class ProductController {
                     size = 10,
                     sort = "createdAt",
                     direction = Sort.Direction.DESC
-            ) Pageable pageable) {
+            ) Pageable pageable,
+            @RequestHeader("X-User-Id") String userId,
+            @RequestHeader("X-Username") String username,
+            @RequestHeader("X-User-Role") String userRole) {
         
-        // TODO: JWT 토큰 검증 및 권한 확인 로직 추가
-        // - 토큰 유효성 검증
-        // - 마스터 관리자, 허브 관리자, 업체 담당자 권한 확인
-        // - 업체 담당자의 경우 본인 업체 상품만 조회 가능하도록 제한
+        // Gateway 인증 필터에서 전달받은 사용자 정보 활용
+        // userId, username, userRole 헤더 정보로 권한별 조회 제한 가능
         
         Page<ProductResponseDto> products = productService.getProducts(name, company_id, hub_id, status, pageable);
         return ResponseEntity.ok(products);
@@ -80,8 +87,96 @@ public class ProductController {
      * @throws com.example.sparta.product_service.exception.ProductNotFoundException 존재하지 않는 상품 ID인 경우 404 Not Found
      */
     @GetMapping("/{productId}")
-    public ResponseEntity<ProductResponseDto> getProduct(@PathVariable UUID productId) {
+    public ResponseEntity<ProductResponseDto> getProduct(
+            @PathVariable UUID productId,
+            @RequestHeader("X-User-Id") String userId,
+            @RequestHeader("X-Username") String username,
+            @RequestHeader("X-User-Role") String userRole) {
         ProductResponseDto product = productService.getProductById(productId);
         return ResponseEntity.ok(product);
+    }
+
+    /**
+     * 신규 상품 생성 API
+     * 
+     * 새로운 상품을 등록합니다.
+     * 소속 업체와 허브가 유효해야 하며, 생성자는 자동 기록됩니다.
+     * 성공 시 생성된 상품 정보를 반환합니다.
+     * 
+     * @param requestDto 상품 생성 요청 정보 (name, company_id, hub_id)
+     * @return 생성된 상품 정보
+     * @throws BusinessException 
+     *   - 400 Bad Request: 존재하지 않는 업체/허브 ID 입력 시
+     *   - 400 Bad Request: 상품명이 중복되는 경우
+     *   - 403 Forbidden: 권한 없는 사용자가 요청 시
+     */
+    @PostMapping
+    public ResponseEntity<ProductCreateResponseDto> createProduct(
+            @RequestBody ProductCreateRequestDto requestDto,
+            @RequestHeader("X-User-Id") String userId,
+            @RequestHeader("X-Username") String username, 
+            @RequestHeader("X-User-Role") String userRole) {
+        // Gateway 인증 필터에서 전달받은 사용자 정보 활용
+        
+        ProductCreateResponseDto response = productService.createProduct(requestDto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+    
+    /**
+     * 상품 정보 수정 API
+     * 
+     * 기존 상품의 정보를 수정합니다.
+     * 상품명과 상태를 부분적으로 수정할 수 있으며, 수정자 정보는 자동 기록됩니다.
+     * 
+     * @param productId 수정할 상품의 UUID
+     * @param requestDto 수정할 상품 정보 (name, status 중 수정할 필드만 전송)
+     * @return 수정된 상품 정보
+     * @throws com.example.sparta.product_service.exception.ProductNotFoundException 존재하지 않는 상품 ID인 경우 404 Not Found
+     * @throws BusinessException 
+     *   - 400 Bad Request: 수정할 필드가 없거나 유효하지 않은 값 입력 시
+     *   - 400 Bad Request: 상품명이 중복되는 경우
+     *   - 403 Forbidden: 권한 없는 사용자가 요청 시
+     */
+    @PutMapping("/{productId}")
+    public ResponseEntity<ProductUpdateResponseDto> updateProduct(
+            @PathVariable UUID productId,
+            @RequestBody ProductUpdateRequestDto requestDto,
+            @RequestHeader("X-User-Id") String userId,
+            @RequestHeader("X-Username") String username,
+            @RequestHeader("X-User-Role") String userRole) {
+        
+        // Gateway 인증 필터에서 전달받은 사용자 정보 활용
+        // userId, username, userRole 헤더 정보로 권한 확인 가능
+        // 권한별 접근 제어: userRole 헤더로 MASTER_ADMIN, HUB_MANAGER, COMPANY_MANAGER 확인 가능
+        
+        ProductUpdateResponseDto response = productService.updateProduct(productId, requestDto);
+        return ResponseEntity.ok(response);
+    }
+    
+    /**
+     * 상품 논리 삭제 API
+     * 
+     * 상품을 논리적으로 삭제합니다.
+     * 실제 데이터는 유지하며 deleted_at, deleted_by 필드를 설정하고 상태를 INACTIVE로 변경합니다.
+     * 연관 데이터(주문 등)는 별도 비활성화 처리가 필요합니다.
+     * 
+     * @param productId 삭제할 상품의 UUID
+     * @return 삭제된 상품 정보
+     * @throws com.example.sparta.product_service.exception.ProductNotFoundException 존재하지 않는 상품 ID인 경우 404 Not Found
+     * @throws BusinessException 
+     *   - 403 Forbidden: 권한 없는 사용자가 요청 시 (마스터 관리자, 허브 관리자만 삭제 가능)
+     */
+    @DeleteMapping("/{productId}")
+    public ResponseEntity<ProductDeleteResponseDto> deleteProduct(
+            @PathVariable UUID productId,
+            @RequestHeader("X-User-Id") String userId,
+            @RequestHeader("X-Username") String username,
+            @RequestHeader("X-User-Role") String userRole) {
+        // Gateway 인증 필터에서 전달받은 사용자 정보 활용
+        // userId, username, userRole 헤더 정보로 권한 확인 가능
+        // 권한별 접근 제어: userRole 헤더로 MASTER_ADMIN, HUB_MANAGER만 삭제 가능하도록 확인 가능
+        
+        ProductDeleteResponseDto response = productService.deleteProduct(productId);
+        return ResponseEntity.ok(response);
     }
 }

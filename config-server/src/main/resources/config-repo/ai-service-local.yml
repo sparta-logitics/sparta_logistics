@@ -21,6 +21,13 @@ management:
       exposure:
         include: refresh
 
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_DEFAULT_ZONE}
+    register-with-eureka: true
+    fetch-registry: true
+
 gemini:
   api:
     url: ${GEMINI_URL}

@@ -1,0 +1,15 @@
+{
+  "request": {
+    "method": "POST",
+    "url": "/internal/predict/eta"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "estimatedArrivalTime": "2025-12-31T18:30:00"
+    }
+  }
+}

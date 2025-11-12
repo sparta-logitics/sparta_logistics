@@ -1,6 +1,7 @@
 package com.example.sparta.hub_service.core.vo;
 
 import jakarta.persistence.Embeddable;
+import java.io.Serializable;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -10,7 +11,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @EqualsAndHashCode
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class HubAddress {
+public class HubAddress implements Serializable {
 
     private String address;
 
