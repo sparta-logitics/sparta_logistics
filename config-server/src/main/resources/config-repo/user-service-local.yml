@@ -14,10 +14,6 @@ spring:
         ddl-auto: update
       show-sql: true
 
-jwt:
-  secret: ${JWT_SECRET}
-  expiration: ${JWT_EXPIRATION}
-
 eureka:
   client:
     service-url:

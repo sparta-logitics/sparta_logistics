@@ -1,0 +1,35 @@
+group = 'com.sparta'
+version = '0.0.1-SNAPSHOT'
+description = 'auth-service'
+
+dependencies {
+    implementation project(':common')
+
+    // Spring Boot 기본 스타터
+    implementation 'org.springframework.boot:spring-boot-starter-web'          // REST API용
+    implementation 'org.springframework.boot:spring-boot-starter-security'     // Spring Security
+    implementation 'org.springframework.boot:spring-boot-starter-validation'   // @Valid, 검증
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'   // Redis (로그아웃 토큰 관리 등)
+
+    // JWT
+    implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
+    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
+    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
+
+    // 테스트
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.security:spring-security-test'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+    // Spring Cloud
+    implementation 'org.springframework.cloud:spring-cloud-starter-config'
+    implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
+
+    implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}
+
+tasks.register("prepareKotlinBuildScriptModel"){}

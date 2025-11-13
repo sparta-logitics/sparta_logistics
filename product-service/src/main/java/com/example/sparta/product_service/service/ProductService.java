@@ -1,10 +1,12 @@
 package com.example.sparta.product_service.service;
 
+import com.example.sparta.common.exception.BusinessException;
+import com.example.sparta.common.exception.ErrorCode;
+import com.example.sparta.company_service.dto.CompanyResponseDto;
+import com.example.sparta.hub_service.hub.domain.vo.HubStatus;
+import com.example.sparta.hub_service.hub.presentation.response.HubDetailResponse;
 import com.example.sparta.product_service.client.CompanyClient;
 import com.example.sparta.product_service.client.HubClient;
-import com.example.sparta.company_service.dto.CompanyResponseDto;
-import com.example.sparta.hub_service.hubs.dto.HubDetailResponse;
-import com.example.sparta.hub_service.core.enums.HubStatus;
 import com.example.sparta.product_service.dto.ProductCreateRequestDto;
 import com.example.sparta.product_service.dto.ProductCreateResponseDto;
 import com.example.sparta.product_service.dto.ProductDeleteResponseDto;
@@ -15,16 +17,13 @@ import com.example.sparta.product_service.dto.ProductUpdateResponseDto;
 import com.example.sparta.product_service.entity.Product;
 import com.example.sparta.product_service.repository.ProductRepository;
 import feign.FeignException;
-import com.example.sparta.common.exception.BusinessException;
-import com.example.sparta.common.exception.ErrorCode;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.UUID;
 
 /**
  * 상품 조회 서비스 구현체

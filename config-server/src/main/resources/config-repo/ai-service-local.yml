@@ -1,0 +1,15 @@
+server:
+  port: ${AI_SERVICE_PORT}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: refresh
+
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_DEFAULT_ZONE}
+    register-with-eureka: true
+    fetch-registry: true

@@ -1,11 +1,10 @@
 package com.example.sparta.product_service.client;
 
-import com.example.sparta.hub_service.hubs.dto.HubDetailResponse;
+import com.example.sparta.hub_service.hub.presentation.response.HubDetailResponse;
+import java.util.UUID;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-
-import java.util.UUID;
 
 /**
  * Hub 서비스와의 통신을 위한 FeignClient

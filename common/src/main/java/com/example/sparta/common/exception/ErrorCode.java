@@ -38,7 +38,10 @@ public enum ErrorCode {
     
     // Hub 관련 에러 (4000번대)
     HUB_NOT_FOUND(HttpStatus.NOT_FOUND, "HUB001", "허브를 찾을 수 없습니다."),
-    
+    HUB_ALREADY_EXISTS(HttpStatus.CONFLICT, "HUB-002", "이미 존재하는 허브입니다."),
+    HUB_CODE_ALREADY_EXISTS(HttpStatus.CONFLICT, "HUB-003", "이미 존재하는 허브 코드입니다."),
+    HUB_CONNECTION_NOT_FOUND(HttpStatus.NOT_FOUND, "HUB-101", "허브 연결을 찾을 수 없습니다."),
+
     // Order 관련 에러 (5000번대)
     ORDER_NOT_FOUND(HttpStatus.NOT_FOUND, "ORD001", "주문을 찾을 수 없습니다."),
     ORDER_MODIFICATION_NOT_ALLOWED(HttpStatus.CONFLICT, "ORD002", "주문 수정이 불가능한 상태입니다."),
